@@ -36,7 +36,7 @@ public class Program
 
                     LutUtil.ApplyLut(imgCopy, lut);
 
-                    img.SaveAsPng(Path.Combine(appArgs.OutputPath, $"{imageName}-{lutName}.png"));
+                    imgCopy.SaveAsPng(Path.Combine(appArgs.OutputPath, $"{imageName}-{lutName}.png"));
                 }
             });
     }
