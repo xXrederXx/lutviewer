@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using CommandLine;
 using LutViewer.Engine.Common;
 using LutViewer.Engine.Util;
@@ -10,6 +11,8 @@ namespace LutViewer.Engine;
 
 public class Program
 {
+    private static Stopwatch stopwatch = new Stopwatch();
+
     private static void Main(string[] args)
     {
         Parser
@@ -20,7 +23,9 @@ public class Program
 
                 if (appArgs.ProcessSize > 0)
                 {
-                    img.Mutate(x => x.Resize(appArgs.ProcessSize, img.Height / img.Width * appArgs.ProcessSize));
+                    img.Mutate(x =>
+                        x.Resize(appArgs.ProcessSize, img.Height / img.Width * appArgs.ProcessSize)
+                    );
                 }
 
                 string imageName = Path.GetFileName(appArgs.ImagePath);
@@ -31,12 +36,22 @@ public class Program
                 foreach (string lutPath in GetLutPaths(appArgs.LutsPath))
                 {
                     string lutName = Path.GetFileName(lutPath);
+
+                    System.Console.WriteLine($"\nStart Processing Lut [{lutName}]\n");
+                    stopwatch.Restart();
+
                     Image<PixelFormat> imgCopy = img.Clone();
                     Lut lut = LutUtil.ReadCubeFile(lutPath);
 
                     LutUtil.ApplyLut(imgCopy, lut);
 
-                    imgCopy.SaveAsPng(Path.Combine(appArgs.OutputPath, $"{imageName}-{lutName}.png"));
+                    string savePath = Path.Combine(
+                        appArgs.OutputPath,
+                        $"{imageName}-{lutName}.png"
+                    );
+                    imgCopy.SaveAsPng(savePath);
+                    System.Console.WriteLine($"Saved lut [{lutName}] at [{savePath}]");
+                    System.Console.WriteLine($"Finished in {stopwatch.ElapsedMilliseconds} ms");
                 }
             });
     }
