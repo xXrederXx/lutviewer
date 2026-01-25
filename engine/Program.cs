@@ -13,7 +13,7 @@ public class Program
     {
         Parser.Default.ParseArguments<AppArgs>(args).WithParsed(appArgs => { });
 
-        Lut lut = CubeUtil.ReadCubeFile(@"C:\Users\Thierry\DEV\cross\lutviewer\test\1\Lut.cube");
+        Lut lut = LutUtil.ReadCubeFile(@"C:\Users\Thierry\DEV\cross\lutviewer\test\1\Lut.cube");
         Image<PixelFormat> img = ImageUtil.OpenImage(@"C:\Users\Thierry\DEV\cross\lutviewer\test\1\WithoutLut.JPG");
         LutUtil.ApplyLut(img, lut);
         img.SaveAsPng("processed.png");

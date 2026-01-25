@@ -31,8 +31,13 @@ public static class ImageUtil
 
     public static Vector3 PixelToVector3(in PixelFormat pixel)
     {
-        return new Vector3(pixel.R / (float)byte.MaxValue, pixel.G / (float)byte.MaxValue, pixel.B / (float)byte.MaxValue);
+        return new Vector3(
+            pixel.R / (float)byte.MaxValue,
+            pixel.G / (float)byte.MaxValue,
+            pixel.B / (float)byte.MaxValue
+        );
     }
+
     public static void ApplyToPixel(in Vector3 newPixel, ref PixelFormat pixel)
     {
         pixel.R = (byte)(newPixel.X * byte.MaxValue);
