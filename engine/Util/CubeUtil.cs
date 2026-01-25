@@ -1,28 +1,30 @@
 using System.Numerics;
+using LutViewer.Engine.Common;
 using ZLinq;
+using ZLinq.Linq;
 
 namespace LutViewer.Engine.Util;
-
+// https://kono.phpage.fr/images/a/a1/Adobe-cube-lut-specification-1.0.pdf
 public static class CubeUtil
 {
     private const string LutSizeFalg = "LUT_3D_SIZE";
 
-    public static Vector3[] ReadCubeFile(string path)
+    public static Lut ReadCubeFile(string path)
     {
-        var content = File.ReadAllLines(path).AsValueEnumerable().Where(x => !x.StartsWith('#'));
+        ValueEnumerable<ArrayWhere<string>, string> content = File.ReadAllLines(path).AsValueEnumerable().Where(x => !x.StartsWith('#'));
 
         string lutSizeLine = content.FirstOrDefault(x => x.StartsWith(LutSizeFalg), string.Empty);
         if (
             lutSizeLine is null
             || lutSizeLine == string.Empty
-            || !int.TryParse(lutSizeLine, out int lutSize)
+            || !int.TryParse(lutSizeLine.Replace(LutSizeFalg, string.Empty), out int lutSize)
         )
         {
             throw new InvalidDataException(
-                $"Could not find or parse line which specifies {LutSizeFalg} in the file {path}"
+                $"Could not find or parse line which specifies {LutSizeFalg} in the file {path}, {lutSizeLine}"
             );
         }
-        var lut = content
+        Vector3[]? lut = content
             .Where(line => char.IsNumber(line[0]) || line[0] == '.')
             .Select(line =>
                 line.Split(' ').AsValueEnumerable().Select(num => float.Parse(num)).ToArray()
@@ -32,7 +34,7 @@ public static class CubeUtil
             .ToArray();
 
         return lut is not null
-            ? lut
+            ? new Lut(lut, lutSize)
             : throw new InvalidDataException($"There was no valide value in the file {path}");
     }
 
@@ -44,5 +46,9 @@ public static class CubeUtil
     /// <param name="b">Blue value</param>
     /// <param name="N">Lut Size, defined in the lut file with the LutSizeFalg </param>
     /// <returns></returns>
-    public static float RGBToLutIndex(float r, float g, float b, int N) => r + N * g + N * N * b;
+    public static float RGBToLutIndex(float r, float g, float b, int N) =>
+        (N - 1) * (r + N * g + N * N * b);
+
+    public static float Vector3ToLutIndex(Vector3 color, int N) =>
+        RGBToLutIndex(color.X, color.Y, color.Z, N);
 }
