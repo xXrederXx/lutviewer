@@ -1,6 +1,7 @@
+from typing import Optional
 import customtkinter as ctk
 from appHeader import AppHeader
-from config import APP_SIZE, APP_THEME, APP_APPERANCE, APP_NAME
+from config import APP_SIZE, APP_THEME, APP_APPERANCE, APP_NAME, AppState
 
 
 class App(ctk.CTk):
