@@ -2,6 +2,7 @@ from typing import Optional
 import customtkinter as ctk
 from appHeader import AppHeader
 from config import APP_SIZE, APP_THEME, APP_APPERANCE, APP_NAME, AppState
+from appBody import AppBody
 
 
 class App(ctk.CTk):
@@ -18,3 +19,6 @@ class App(ctk.CTk):
 
         self.header = AppHeader(self)
         self.header.grid(row=0, column=0, sticky="nsew")
+        
+        self.body = AppBody(self)
+        self.body.grid(row=1, column=0, sticky="nsew")
