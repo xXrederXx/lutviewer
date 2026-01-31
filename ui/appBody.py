@@ -24,7 +24,6 @@ class AppBody(ctk.CTkScrollableFrame):
         self.after(IMAGE_RELOAD_INTERVAL_MS, self.refresh_images)
 
     def update_ui(self):
-        print("Updating")
         images = self.get_images()
         width = self.winfo_width()
         

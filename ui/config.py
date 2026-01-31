@@ -28,6 +28,8 @@ IMAGE_RELOAD_INTERVAL_MS = 1000
 IMAGE_PATH_PATTERN = "*.png"
 
 
+ENGINE_EXE_PATH = Path(r"C:\Users\Thierry\DEV\cross\lutviewer\engine\bin\Release\net10.0\engine.exe")
+
 print("LOADED APP CONFIG:")
 print(f"\t-{APP_NAME}")
 print(f"\t-{APP_SIZE}")

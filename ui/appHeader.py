@@ -1,7 +1,8 @@
 from typing import Any, Optional
 import customtkinter as ctk
-from config import APP_NAME, HEADER_FONT, AppState
-
+from config import APP_NAME, HEADER_FONT, AppState, IMAGE_TEMP_FOLDER
+from engine import EngineArgs, execute_engine
+from pathlib import Path
 
 class AppHeader(ctk.CTkFrame):
     def __init__(self, master: Any):
@@ -15,19 +16,28 @@ class AppHeader(ctk.CTkFrame):
         self.title = ctk.CTkLabel(self, text=APP_NAME, font=HEADER_FONT, height=60)
         self.title.grid(row=0, column=0, sticky="w", padx=12)
 
+        self.run_btn = ctk.CTkButton(
+            self, text="Run", command=self.click_run
+        )
+        self.run_btn.grid(row=0, column=1, padx=12)
+        
         self.image_btn = ctk.CTkButton(
             self, text="Open Image", command=self.click_open_image
         )
-        self.image_btn.grid(row=0, column=1, padx=12)
+        self.image_btn.grid(row=0, column=2, padx=12)
 
         self.lut_btn = ctk.CTkButton(
             self, text="Open LUTs", command=self.click_open_luts
         )
-        self.lut_btn.grid(row=0, column=2, padx=12)
+        self.lut_btn.grid(row=0, column=3, padx=12)
 
         self.preview_size_entry = ctk.CTkEntry(self, placeholder_text="Render Width")
-        self.preview_size_entry.grid(row=0, column=3, padx=12)
+        self.preview_size_entry.grid(row=0, column=4, padx=12)
 
+    def click_run(self):
+        args = EngineArgs(Path(self._app_state.image_path), IMAGE_TEMP_FOLDER, self._app_state.image_width, Path(self._app_state.luts_folder))
+        execute_engine(args)
+    
     def click_open_image(self):
         path = ctk.filedialog.askopenfile()
         if path is not None:
@@ -40,7 +50,7 @@ class AppHeader(ctk.CTkFrame):
         size: int = -1
 
         try:
-            size = int(self.preview_size_entry.get())
+            size = int(self.preview_size_entry.cget("text"))
         except:
             size = -1
 
