@@ -10,20 +10,29 @@ class AppBody(ctk.CTkScrollableFrame):
         super().__init__(master)
 
         self.image_paths: List[Path] = []
+        self.last_width = -1
 
         self.after(IMAGE_RELOAD_INTERVAL_MS, self.refresh_images)
+        self.bind("<Configure>", lambda e: self.update_ui(), "+")
+
+    def get_images(self):
+        files = Path(IMAGE_TEMP_FOLDER).rglob(IMAGE_PATH_PATTERN)
+        return list(files)
 
     def refresh_images(self):
-        print("Updating")
-        files = Path(IMAGE_TEMP_FOLDER).rglob(IMAGE_PATH_PATTERN)
-        self.update_ui(list(files))
+        self.update_ui()
         self.after(IMAGE_RELOAD_INTERVAL_MS, self.refresh_images)
 
-    def update_ui(self, images: List[Path]):
-        if images == self.image_paths:
+    def update_ui(self):
+        print("Updating")
+        images = self.get_images()
+        width = self.winfo_width()
+        
+        if images == self.image_paths and self.last_width == width:
             return
 
         self.image_paths = images
+        self.last_width = width
 
         for child in self.winfo_children():
             child.destroy()
@@ -32,7 +41,7 @@ class AppBody(ctk.CTkScrollableFrame):
         col = 0
         PADDING = 8
         MAX_COLS = 4
-        IMAGE_WIDTH = 200
+        IMAGE_WIDTH = width // MAX_COLS - 2 * PADDING
 
         for path in images:
             item = ctk.CTkFrame(self, fg_color="transparent")
