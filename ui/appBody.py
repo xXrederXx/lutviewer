@@ -54,18 +54,22 @@ class AppBody(ctk.CTkScrollableFrame):
             name_label.pack(pady=(0, 4))
 
             # load image
-            with Image.open(path) as pil_image:
-                image = ctk.CTkImage(
-                    light_image=pil_image,
-                    dark_image=pil_image,
-                    size=(
-                        int(IMAGE_WIDTH),
-                        int(pil_image.height / pil_image.width * IMAGE_WIDTH),
-                    ),
-                )
+            try:
+                with Image.open(path) as pil_image:
+                    image = ctk.CTkImage(
+                        light_image=pil_image,
+                        dark_image=pil_image,
+                        size=(
+                            int(IMAGE_WIDTH),
+                            int(pil_image.height / pil_image.width * IMAGE_WIDTH),
+                        ),
+                    )
 
-                image_label = ctk.CTkLabel(item, text="", image=image)
-                image_label.pack()
+                    image_label = ctk.CTkLabel(item, text="", image=image)
+                    image_label.pack()
+            except PermissionError as ex:
+                print("Could not open file, cause: permission error.", ex, path)
+                continue
 
             # grid layout logic
             col += 1
