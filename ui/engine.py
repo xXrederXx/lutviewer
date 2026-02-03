@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from subprocess import Popen, run, PIPE
 from config import ENGINE_EXE_PATH
-
+from typing import Tuple
 
 @dataclass
 class EngineArgs:
@@ -12,7 +12,7 @@ class EngineArgs:
     luts: Path
 
 
-def execute_engine(args: EngineArgs):
+def execute_engine(args: EngineArgs) -> Tuple[str, str]:
     list_args = [
         str(ENGINE_EXE_PATH.resolve()),
         "-i",
@@ -24,7 +24,7 @@ def execute_engine(args: EngineArgs):
         "-l",
         str(args.luts.resolve()),
     ]
-
+    
     result = run(
         list_args,
         text=True,
@@ -37,3 +37,5 @@ def execute_engine(args: EngineArgs):
 
     print(result.stdout)
     print(result.stderr)
+    
+    return (result.stdout, result.stderr)

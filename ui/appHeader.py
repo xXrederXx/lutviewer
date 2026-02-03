@@ -10,7 +10,7 @@ class AppHeader(ctk.CTkFrame):
 
         self._app_state: AppState = AppState("", "", -1)
 
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure((0,1), weight=1)
         self.grid_columnconfigure(0, weight=1)
 
         self.title = ctk.CTkLabel(self, text=APP_NAME, font=HEADER_FONT, height=60)
@@ -33,10 +33,13 @@ class AppHeader(ctk.CTkFrame):
 
         self.preview_size_entry = ctk.CTkEntry(self, placeholder_text="Render Width")
         self.preview_size_entry.grid(row=0, column=4, padx=12)
+        
+        self.err_label = ctk.CTkLabel(self, text="")
+        self.err_label.grid(row=0, column=0, padx=12)
 
     def click_run(self):
         args = EngineArgs(Path(self._app_state.image_path), IMAGE_TEMP_FOLDER, self._app_state.image_width, Path(self._app_state.luts_folder))
-        execute_engine(args)
+        stdout, stderr = execute_engine(args)
     
     def click_open_image(self):
         path = ctk.filedialog.askopenfile()
