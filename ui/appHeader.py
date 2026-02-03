@@ -35,8 +35,15 @@ class AppHeader(ctk.CTkFrame):
         self.preview_size_entry = ctk.CTkEntry(self, placeholder_text="Render Width")
         self.preview_size_entry.grid(row=0, column=4, padx=12)
 
-        self.err_label = ctk.CTkLabel(self, text="")
-        self.err_label.grid(row=0, column=0, padx=12)
+        self.info_label = ctk.CTkLabel(self, text="", anchor="w")
+        self.info_label.grid(row=1, column=0, columnspan=5, padx=12, sticky="w")
+
+    def set_info_label(self, new_text: str):
+        MAX_LEN = 128
+        length = min(len(new_text), MAX_LEN)
+        self.info_label.configure(
+            text=new_text[:length] + (" ..." if length == MAX_LEN else "")
+        )
 
     def click_run(self):
         args = EngineArgs(
@@ -53,6 +60,9 @@ class AppHeader(ctk.CTkFrame):
         path = ctk.filedialog.askopenfile()
         if path is not None:
             self._app_state.image_path = path.name
+            self.set_info_label(f"Set image path to: {path.name}")
+        else:
+            self.set_info_label("Failed to set image path!")
 
     def _run_engine_thread(self, args: EngineArgs):
         stdout, stderr = asyncio.run(execute_engine(args))
@@ -60,12 +70,13 @@ class AppHeader(ctk.CTkFrame):
 
     def _on_engine_done(self, stdout: str, stderr: str):
         if stderr:
-            self.err_label.configure(text=stderr)
+            self.set_info_label(stderr)
         else:
-            self.err_label.configure(text="Done!")
+            self.set_info_label("Done!")
 
     def click_open_luts(self):
         self._app_state.luts_folder = ctk.filedialog.askdirectory()
+        self.set_info_label(f"Set luts folder to: {self._app_state.luts_folder}")
 
     def get_app_state(self):
         size: int = -1
