@@ -36,7 +36,13 @@ class AppHeader(ctk.CTkFrame):
         self.preview_size_entry.grid(row=0, column=4, padx=12)
 
         self.info_label = ctk.CTkLabel(self, text="", anchor="w")
-        self.info_label.grid(row=1, column=0, columnspan=5, padx=12, sticky="w")
+        self.info_label.grid(row=1, column=0, columnspan=2, padx=12, sticky="w")
+
+        self.image_label = ctk.CTkLabel(self, text="", anchor="w")
+        self.image_label.grid(row=1, column=2, padx=12, sticky="w")
+
+        self.luts_label = ctk.CTkLabel(self, text="", anchor="w")
+        self.luts_label.grid(row=1, column=3, padx=12, sticky="w")
 
     def set_info_label(self, new_text: str):
         MAX_LEN = 128
@@ -61,6 +67,7 @@ class AppHeader(ctk.CTkFrame):
         if path is not None:
             self._app_state.image_path = path.name
             self.set_info_label(f"Set image path to: {path.name}")
+            self.image_label.configure(text=Path(path.name).name)
         else:
             self.set_info_label("Failed to set image path!")
 
@@ -77,6 +84,7 @@ class AppHeader(ctk.CTkFrame):
     def click_open_luts(self):
         self._app_state.luts_folder = ctk.filedialog.askdirectory()
         self.set_info_label(f"Set luts folder to: {self._app_state.luts_folder}")
+        self.luts_label.configure(text=Path(self._app_state.luts_folder).parts[-1])
 
     def get_app_state(self):
         size: int = -1
