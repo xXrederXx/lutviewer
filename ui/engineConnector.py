@@ -3,6 +3,8 @@ from pathlib import Path
 from subprocess import Popen, run, PIPE
 from config import ENGINE_EXE_PATH
 from typing import Tuple
+import asyncio
+
 
 @dataclass
 class EngineArgs:
@@ -12,8 +14,8 @@ class EngineArgs:
     luts: Path
 
 
-def execute_engine(args: EngineArgs) -> Tuple[str, str]:
-    list_args = [
+async def execute_engine(args: EngineArgs) -> Tuple[str, str]:
+    proc = await asyncio.create_subprocess_exec(
         str(ENGINE_EXE_PATH.resolve()),
         "-i",
         str(args.image.resolve()),
@@ -23,19 +25,22 @@ def execute_engine(args: EngineArgs) -> Tuple[str, str]:
         str(args.size),
         "-l",
         str(args.luts.resolve()),
-    ]
-    
-    result = run(
-        list_args,
-        text=True,
         stdout=PIPE,
         stderr=PIPE,
-        check=False,
     )
 
-    print(list_args)
+    stdout, stderr = await proc.communicate()
+    stdout = stdout.decode()
+    stderr = stderr.decode()
 
-    print(result.stdout)
-    print(result.stderr)
-    
-    return (result.stdout, result.stderr)
+    print(
+        f'-i "{args.image.resolve()}"',
+        f'-o "{args.out.resolve()}"',
+        f"-s {args.size}",
+        f'-l "{args.luts.resolve()}',
+    )
+
+    print("STDOUT: ", stdout)
+    print("STDERR: ", stderr)
+
+    return (stdout, stderr)
