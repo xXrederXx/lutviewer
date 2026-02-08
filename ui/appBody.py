@@ -1,8 +1,10 @@
+from tkinter import Toplevel
 import customtkinter as ctk
 from typing import Any, Iterable, List, Tuple
 from config import IMAGE_RELOAD_INTERVAL_MS, IMAGE_TEMP_FOLDER, IMAGE_PATH_PATTERN
 from pathlib import Path
 from PIL import Image
+from time import time
 
 from imageService import ImageService
 
@@ -16,12 +18,19 @@ class AppBody(ctk.CTkScrollableFrame):
         self.image_paths: List[Tuple[Path, ctk.CTkImage]] = []
         self.last_width = -1
 
+        self.last_configure = time()
+
         self.after(IMAGE_RELOAD_INTERVAL_MS, self.refresh_images)
         self.bind("<Configure>", lambda e: self.update_ui(), "+")
 
     def refresh_images(self):
         self.update_ui()
         self.after(IMAGE_RELOAD_INTERVAL_MS, self.refresh_images)
+
+    def on_configure(self):
+        if time() - self.last_configure > 0.3:
+            self.last_configure = time()
+            self.update_ui()
 
     def update_ui(self):
         images = self.image_service.get_ctk_images()
@@ -34,7 +43,8 @@ class AppBody(ctk.CTkScrollableFrame):
         self.last_width = width
 
         for child in self.winfo_children():
-            child.destroy()
+            if not isinstance(child, Toplevel):
+                child.grid_forget()
 
         row = 0
         col = 0
